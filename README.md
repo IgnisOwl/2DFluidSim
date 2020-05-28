@@ -1,0 +1,1 @@
+I mainly made this to learn SDL2 in C++ so that's why there is some random other cpp files in which i am just messing around trying to learn stuff.
