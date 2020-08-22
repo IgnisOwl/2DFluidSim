@@ -1,1 +1,1 @@
-Maybe use pure OpenGL instead of the SDL rect functions, might increase performance.
+*Perhaps use SDL2's OpenGL functions, and possibly use nvidia CUDA libraries to increase performance*
