@@ -4,7 +4,6 @@ using namespace std;
 
 Dynamics::Dynamics() {
     //setup
-    srand(time(0));
 }
 
 vector<vector<unique_ptr<float>>> Dynamics::calculateStep(vector<vector<unique_ptr<float>>>& gridIn) {
@@ -15,18 +14,27 @@ vector<vector<unique_ptr<float>>> Dynamics::calculateStep(vector<vector<unique_p
         for(int dim1i = 0; dim1i<gridIn.at(dim2i).size(); dim1i++) {
             float oldVal = *gridIn.at(dim2i).at(dim1i);
             float newVal;
-            if(((rand() % 2) + 0) == 1) { //random value between 0 and 1 so 1/2 chance
-                newVal = oldVal - ((((float) (rand() % 100)) + 0));
+
+            //cout << oldVal << endl;
+
+            //How high the number is changes the change of whether it will go up or down
+            if(genRandom(0,1) == 0) {
+                newVal = oldVal - 0.01F;
             }
             else {
-                newVal = oldVal + ((((float) (rand() % 100)) + 0));
+                newVal = oldVal + 0.01F;
             }
+            if(newVal<0.0F)
+                newVal=0.0F;
+            if(newVal>1.0F)
+                newVal=1.0F;
+
+
             unique_ptr<float> dim1 = make_unique<float>(newVal);
 
             dim2.push_back(std::move(dim1));
         }
         gridOut.push_back(std::move(dim2));
     }
-    
-    return(normalize2DMatrix(gridOut, 0, 100, 0.0F, 1.0F));
+    return(gridOut);
 }

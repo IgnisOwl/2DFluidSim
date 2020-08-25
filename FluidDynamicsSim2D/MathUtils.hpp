@@ -3,8 +3,15 @@
 #include <vector>
 #include <memory>
 #include <math.h>
+#include <time.h>
 
 using namespace std;
+
+namespace MathUtils {
+    static void setup() {
+        srand(time(0));
+    }
+}
 
 /* ------------- 2D VECTOR/MATRIX NORMALIZATION ------------ */
 //Default is float in int out
@@ -61,6 +68,10 @@ static vector<vector<unique_ptr<float>>> normalize2DMatrix(vector<vector<unique_
     /*              */
 
     return(out);
+}
+
+static int genRandom(int min, int max) {
+    return((rand() % (max+1)) + min);
 }
 
 /* -----------------                        ---------------------- */

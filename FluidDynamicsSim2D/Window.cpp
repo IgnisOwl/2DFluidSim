@@ -29,7 +29,7 @@ Main::Main() {
 
         handleEvents();
 
-        simulationGrid = dynamics.calculateStep(simulationGrid);
+        simulationGrid = std::move(dynamics.calculateStep(simulationGrid));
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
@@ -55,6 +55,7 @@ Main::Main() {
 
 void Main::initialize() {
     initializeGLEW();
+    MathUtils::setup();
 
     int flags;
     flags = 0;
