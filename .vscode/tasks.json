@@ -7,9 +7,9 @@
             "command": "/usr/bin/g++",
             "args": [//Include libraries: https://stackoverflow.com/questions/6141147/how-do-i-include-a-path-to-libraries-in-g
                 "-g",
-                "${file}",
+                "${fileDirname}/**.cpp",
                 "-o",
-                "${fileDirname}/${fileBasenameNoExtension}",
+                "${fileDirname}/FD2S",
                 "-lGL",
                 "-lGLEW", 
                 "-lSDL2",
