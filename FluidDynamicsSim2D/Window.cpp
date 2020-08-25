@@ -15,7 +15,7 @@ int main(int argc, const char * argv[]) {
 }
 
 Main::Main() {
-    const int FPS = 60;
+    const int FPS = 1000;
     const int frameDelay = 1000 / FPS;  //calculated frame delay based on FPS
     Uint32 calculationStartTime;        //Calculation time marker, to calculate the final time to wait to get the fps to 60, as it will take some time to calculate appropraite things before frame render
     int calculationTime;                //time it takes to perform pre render calulations
@@ -29,6 +29,8 @@ Main::Main() {
 
         handleEvents();
 
+        simulationGrid = dynamics.calculateStep(simulationGrid);
+
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
         /*Render the data*/
@@ -40,7 +42,7 @@ Main::Main() {
         calculationTime = SDL_GetTicks() - calculationStartTime;   //gets how long it took to handle events and stuff
         if(calculationTime < frameDelay)                           //If the calculations took less time then delay the amount of time to make it the target framerate, otherwise don't delay
         {
-            //SDL_Delay(frameDelay - calculationTime);               //delay the amount of time it takes to make it 60fps minus the amount it took to perform calculations
+            SDL_Delay(frameDelay - calculationTime);               //delay the amount of time it takes to make it 60fps minus the amount it took to perform calculations
         }
 
         currentFPS = countedFrames / (SDL_GetTicks() / 1000.0f);                    //calculated current FPS
@@ -66,7 +68,7 @@ void Main::initialize() {
             std::cout << "Failed to init window." << std::endl;
         }
 
-
+        //renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);     //CPU only
         renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);    //GPU accelerated rendering: //https://dev.to/noah11012/using-sdl2-2d-accelerated-renderering-1kcb
         if(!renderer) {
             //failed to initialize renderer 

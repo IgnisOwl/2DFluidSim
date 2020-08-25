@@ -10,13 +10,14 @@
 #include "Renderer.hpp"
 #include "Program.hpp"
 #include "CFDynamics.hpp"
+#include "MathUtils.hpp"
 
 //Extern/global vars
-int winSizeX = 500;     //Tile size will automatically adjust according to this
-int winSizeY = 500;     //Tile size will automatically adjust according to this
-int tileRows = 25;
-int tileCols = 25;
-int cellBuffer = 15;    //note that this is not px
+int winSizeX = 800;     //Tile size will automatically adjust according to this
+int winSizeY = 800;     //Tile size will automatically adjust according to this
+int tileRows = 50;
+int tileCols = 50;
+int cellBuffer = 0;    //note that this is not px
 
 class Main {
     public:
@@ -26,6 +27,7 @@ class Main {
         SDL_Renderer* getRenderer();
 
     private:
+        Dynamics dynamics;
         SDL_Window *window;
         SDL_Renderer *renderer;
         Renderer dataRenderer;  //Object is cosntructed with default constructor when defined

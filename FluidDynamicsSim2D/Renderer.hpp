@@ -5,7 +5,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include "Program.hpp"
-
+#include "MathUtils.hpp"
 
 using namespace std;
 
