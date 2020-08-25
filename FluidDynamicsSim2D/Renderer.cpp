@@ -34,7 +34,7 @@ void Renderer::renderData() {
     float initialOffsetY = (((1+((float)cellBuffer/1000))*calculatedTileHeight)-calculatedTileHeight)/2;
     /*                      */
 
-    vector<vector<unique_ptr<int>>> normalizedDataMatrix = normalize2DMatrix(simulationGrid, 0.0F, 1.0F, 0.0F, 255.0F);     //convert vals 0-1 to 0-255
+    vector<vector<unique_ptr<int>>> normalizedDataMatrix = normalize2DMatrix(simulationGrid, 0.0F, 1.0F, 0, 255);     //convert vals 0-1 to 0-255
 
     int colorVal;
 
