@@ -1,2 +1,3 @@
 - Perhaps use SDL2's OpenGL functions, and possibly use nvidia CUDA libraries to increase performance
 - Make MathUtils's matrix normalization support generic template speciialization to specify what type should be used(cleaner code)
+- Add a C++ Makefile (and mayb Cmakefile)

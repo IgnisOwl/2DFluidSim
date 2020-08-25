@@ -1,5 +1,7 @@
 #include "Window.hpp"
 
+/*Program made by Connor Michalec with help from: https://mikeash.com/pyblog/fluid-simulation-for-dummies.html */
+
 signed int initializeGLEW() {
     #ifndef __APPLE__
     glewExperimental = GL_TRUE;

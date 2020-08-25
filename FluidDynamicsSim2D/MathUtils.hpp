@@ -3,7 +3,7 @@
 #include <vector>
 #include <memory>
 #include <math.h>
-
+#include "Program.hpp"
 using namespace std;
 
 /* ------------- 2D VECTOR/MATRIX NORMALIZATION ------------ */
@@ -65,3 +65,7 @@ static vector<vector<unique_ptr<float>>> normalize2DMatrix(vector<vector<unique_
 
 /* -----------------                        ---------------------- */
 
+/*Given any x y, return a 1D Index of that position*/
+static int cast_1D_2D(int col, int row) {
+    return((row * tileRows) + col);
+}
