@@ -1,7 +1,7 @@
 #include "Renderer.hpp"
 #include "MathUtils.hpp"
 
-vector<vector<unique_ptr<float>>> simulationData;
+vector<vector<unique_ptr<float>>> simulationGrid;
 
 Renderer::Renderer() {
     //default constructor
@@ -11,14 +11,14 @@ Renderer::Renderer() {
 Renderer::Renderer(SDL_Renderer* renderer) : windowRenderer(renderer) {
     //initialize data vector
 
-    simulationData = vector<vector<unique_ptr<float>>>();
+    simulationGrid = vector<vector<unique_ptr<float>>>();
 
     for(int rowIndex = 0; rowIndex < tileRows; rowIndex++) {
         vector<unique_ptr<float>> row = vector<unique_ptr<float>>();
         for(int colIndex = 0; colIndex < tileCols; colIndex++) {
             row.push_back(make_unique<float>(0.0F));
         }
-        simulationData.push_back(std::move(row)); //Move the data because it is filled with smart pointers, and smart pointers cant be copied
+        simulationGrid.push_back(std::move(row)); //Move the data because it is filled with smart pointers, and smart pointers cant be copied
     }
 }
 
@@ -34,7 +34,7 @@ void Renderer::renderData() {
     float initialOffsetY = (((1+((float)cellBuffer/1000))*calculatedTileHeight)-calculatedTileHeight)/2;
     /*                      */
 
-    vector<vector<unique_ptr<int>>> normalizedDataMatrix = normalize2DMatrix(simulationData, 0.0F, 1.0F, 0.0F, 255.0F);     //convert vals 0-1 to 0-255
+    vector<vector<unique_ptr<int>>> normalizedDataMatrix = normalize2DMatrix(simulationGrid, 0.0F, 1.0F, 0.0F, 255.0F);     //convert vals 0-1 to 0-255
 
     int colorVal;
 

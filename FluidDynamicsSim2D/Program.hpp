@@ -14,6 +14,6 @@ extern int winSizeY;
 extern int tileRows;
 extern int tileCols;
 extern int cellBuffer;
-extern vector<vector<unique_ptr<float>>> simulationData;
+extern vector<vector<unique_ptr<float>>> simulationGrid;
 
 #endif

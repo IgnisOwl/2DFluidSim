@@ -9,7 +9,7 @@
 #include <vector>
 #include "Renderer.hpp"
 #include "Program.hpp"
-#include "Dynamics.hpp"
+#include "CFDynamics.hpp"
 
 //Extern/global vars
 int winSizeX = 500;     //Tile size will automatically adjust according to this
