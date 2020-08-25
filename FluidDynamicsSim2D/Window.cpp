@@ -15,7 +15,7 @@ int main(int argc, const char * argv[]) {
 }
 
 Main::Main() {
-    const int FPS = 1000;
+    const int FPS = 60;
     const int frameDelay = 1000 / FPS;  //calculated frame delay based on FPS
     Uint32 calculationStartTime;        //Calculation time marker, to calculate the final time to wait to get the fps to 60, as it will take some time to calculate appropraite things before frame render
     int calculationTime;                //time it takes to perform pre render calulations
