@@ -17,7 +17,7 @@ int winSizeX = 800;     //Tile size will automatically adjust according to this
 int winSizeY = 800;     //Tile size will automatically adjust according to this
 int tileRows = 50;
 int tileCols = 50;
-int cellBuffer = 10;    //note that this is not px
+int cellBuffer = 0;    //note that this is not px
 
 class Main {
     public:
