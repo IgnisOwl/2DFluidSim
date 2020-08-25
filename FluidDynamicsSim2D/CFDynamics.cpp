@@ -1,15 +1,12 @@
-#include <vector>
-#include <memory>
+#include "CFDynamics.hpp"
 
 using namespace std;
 
-class Dynamics {
-    Dynamics() {
-        //setup
-    }
+Dynamics::Dynamics() {
+    //setup
+}
 
-    vector<vector<unique_ptr<float>>> calculateStep(vector<vector<unique_ptr<float>>>& gridIn) {
-        vector<vector<unique_ptr<float>>> gridOut = vector<vector<unique_ptr<float>>>();
-        return(gridOut);
-    }
-}; 
+vector<vector<unique_ptr<float>>> Dynamics::calculateStep(vector<vector<unique_ptr<float>>>& gridIn) {
+    vector<vector<unique_ptr<float>>> gridOut = vector<vector<unique_ptr<float>>>();
+    return(gridOut);
+}
