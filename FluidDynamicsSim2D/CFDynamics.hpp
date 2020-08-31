@@ -10,6 +10,7 @@ using namespace std;
 class Dynamics {
     public:
         Dynamics();
+        ~Dynamics();
         vector<vector<unique_ptr<float>>> calculateStep(vector<vector<unique_ptr<float>>>& gridIn);
 
 
@@ -21,7 +22,7 @@ class Dynamics {
         const float iterations = 11;
         /*        */
 
-        /*RUNTIME ARRAYS*/
+        /*RUNTIME ARRAYS TODO: Dynamically allocated them on heap instead(with malloc)*/
         float* previousDensity;
         float* density;
         
@@ -39,4 +40,5 @@ class Dynamics {
         void calculateDiffusion(int b, float* x, float* previousX, float diffusion, float timeSteps);
         void linearSolve(int b, float* x, float* previousX, float a, float c);
         void project(float *velocityX, float *velocityY, float *p, float *div);
+        void advect(int b, float *density, float *previousDensity,  float *velocityX, float *velocityY);
 };

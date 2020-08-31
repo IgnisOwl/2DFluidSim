@@ -16,7 +16,11 @@ using namespace std;
  *
  *   4) ADVECTION - This is responsible for moving the fluid around, it looks at each cell iteratively and it takes the velocity,
  *                    comapres it with previous velocity(or it follows it back in time), and it sees where it lands. It then takes a weighted average(each observation has a frequnecy/weight assigned to it)
- *                    of the cells around the spot where it lands and applies tat value to the current cell, so it basically is allowing cells to push velocities to other cells.
+ *                    of the cells around the spot where it lands and applies tat value to the current cell, so it basically is allowing cells to push velocities to other cells. Note that diffusion is the motion of the fluid spreading
+ *                    out, advection is the motion associated with velocities.
+ * 
+ *   5) SET_BND - This handles the edge and corner cells and how they interact/bounce. The fluid needs to become "Mirrored"
+ *                  The b variable tells us what "wall" we are at
  *                    
  */
 Dynamics::Dynamics() {
@@ -101,17 +105,66 @@ void Dynamics::project(float *velocityX, float *velocityY, float *p, float *div)
 
     linearSolve(0, p, div, 1, 6);
     
-        for (int j = 1; j < tileRows - 1; j++) {
-            for (int i = 1; i < tileCols - 1; i++) {
-                velocityX[cast_1D_2D(i, j)] -= 0.5f * (  p[cast_1D_2D(i+1, j)]
-                                                -p[cast_1D_2D(i-1, j)]) * tileCols;
-                velocityY[cast_1D_2D(i, j)] -= 0.5f * (  p[cast_1D_2D(i, j+1)]
-                                                -p[cast_1D_2D(i, j-1)]) * tileRows;
-            }
+    for (int j = 1; j < tileRows - 1; j++) {
+        for (int i = 1; i < tileCols - 1; i++) {
+            velocityX[cast_1D_2D(i, j)] -= 0.5f * (  p[cast_1D_2D(i+1, j)]
+                                            -p[cast_1D_2D(i-1, j)]) * tileCols;
+            velocityY[cast_1D_2D(i, j)] -= 0.5f * (  p[cast_1D_2D(i, j+1)]
+                                            -p[cast_1D_2D(i, j-1)]) * tileRows;
         }
     }
 
     set_bnd(1, velocityX);
     set_bnd(2, velocityY);
     set_bnd(3, velocityZ);
+}
+
+void Dynamics::advect(int b, float *density, float *previousDensity,  float *velocityX, float *velocityY) {
+    float i0, i1, j0, j1; //Index and previous index
+    
+    float dtx = timeSteps * (tileCols - 2);
+    float dty = timeSteps * (tileRows - 2);
+    
+    float s0, s1, t0, t1;
+    float tmp1, tmp2, x, y;
+    
+    float Nfloat = tileCols;
+    float ifloat, jfloat;
+    int i, j;
+    
+    for(j = 1, jfloat = 1; j < tileRows - 1; j++, jfloat++) { 
+        for(i = 1, ifloat = 1; i < tileCols - 1; i++, ifloat++) {
+            tmp1 = dtx * velocityX[cast_1D_2D(i, j)];
+            tmp2 = dty * velocityY[cast_1D_2D(i, j)];
+            x    = ifloat - tmp1; 
+            y    = jfloat - tmp2;
+            
+            if(x < 0.5f) x = 0.5f; 
+            if(x > Nfloat + 0.5f) x = Nfloat + 0.5f; 
+            i0 = floorf(x); 
+            i1 = i0 + 1.0f;
+            if(y < 0.5f) y = 0.5f; 
+            if(y > Nfloat + 0.5f) y = Nfloat + 0.5f; 
+            j0 = floorf(y);
+            j1 = j0 + 1.0f; 
+            
+            s1 = x - i0; 
+            s0 = 1.0f - s1; 
+            t1 = y - j0; 
+            t0 = 1.0f - t1;
+            
+            int i0i = i0;
+            int i1i = i1;
+            int j0i = j0;
+            int j1i = j1;
+            
+            density[cast_1D_2D(i, j)] = 
+            
+                s0 * ( t0 * previousDensity[cast_1D_2D(i0i, j0i)])
+                    +( t1 * previousDensity[cast_1D_2D(i0i, j1i)])
+                +s1 * ( t0 * previousDensity[cast_1D_2D(i1i, j0i)])
+                    +( t1 * previousDensity[cast_1D_2D(i1i, j1i)]);
+        }
+    }
+    set_bnd(b, density);
 }
