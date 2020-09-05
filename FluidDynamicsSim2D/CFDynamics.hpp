@@ -11,8 +11,10 @@ class Dynamics {
     public:
         Dynamics();
         ~Dynamics();
-        vector<vector<unique_ptr<float>>> calculateStep(vector<vector<unique_ptr<float>>>& gridIn);
+        //Converts the 1d matrix being used in this class to 2D vectors for easier graphical representation
+        vector<vector<unique_ptr<float>>> getProcessedStep(vector<vector<unique_ptr<float>>>& gridIn);
 
+        void simulationStep();
 
     private:
         /*SETTINGS*/
@@ -33,12 +35,15 @@ class Dynamics {
         float* previousVelocityX;
         /*              */
 
+
+
         void addDensity(int x, int y, float amount);      //This function adds fluid desnsity to a specified location
         void addVelocity(int x, int y, float amountX, float amountY);      //This function adds fluid velocity to a specified location 
-        
+
         //CONFUSING(I barely know how these work):
         void calculateDiffusion(int b, float* x, float* previousX, float diffusion, float timeSteps);
         void linearSolve(int b, float* x, float* previousX, float a, float c);
         void project(float *velocityX, float *velocityY, float *p, float *div);
-        void advect(int b, float *density, float *previousDensity,  float *velocityX, float *velocityY);
+        void advect(int b, float *density, float *previousDensity,  float *velocityX, float *velocityY, float timeSteps);
+        void set_bnd(int b, float *x);
 };

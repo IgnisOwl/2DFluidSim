@@ -10,7 +10,8 @@ using namespace std;
  *                   The Navier-Stokes equations is what calculates this.
  *
  *   2) PROJECT -  This is tied to the concept of the fluid being incompressible, so the amount of fluid going in has to
- *                   be equal to the amount coming up, this is a setup stage to put the system into equilibrium.
+ *                   be equal to the amount coming up, this is a setup stage to put the system into equilibrium. Basically it
+ *                   cleans up and makes sure it's the same amount of fluid everywhere.
  *
  *   3) LINEAR SOLVING - This solves a linear diffrential equation and i have no idea how it works or anything the code is just stolen
  *
@@ -21,6 +22,8 @@ using namespace std;
  * 
  *   5) SET_BND - This handles the edge and corner cells and how they interact/bounce. The fluid needs to become "Mirrored"
  *                  The b variable tells us what "wall" we are at
+ * 
+ *   6) SIMULATIONSTEP - This function puts all of this together and actually calculates each "step" in the simulation.
  *                    
  */
 Dynamics::Dynamics() {
@@ -46,7 +49,7 @@ Dynamics::~Dynamics() {
     delete previousVelocityX;
 }
 
-vector<vector<unique_ptr<float>>> Dynamics::calculateStep(vector<vector<unique_ptr<float>>>& gridIn) {
+vector<vector<unique_ptr<float>>> Dynamics::getProcessedStep(vector<vector<unique_ptr<float>>>& gridIn) {
     vector<vector<unique_ptr<float>>> gridOut = vector<vector<unique_ptr<float>>>();
     return(gridOut);
 }
@@ -65,6 +68,33 @@ void Dynamics::addVelocity(int x, int y, float amountX, float amountY) {
 void Dynamics::calculateDiffusion(int b, float* x, float* previousX, float diffusion, float timeSteps) {
     float a = timeSteps * diffusion * (tileCols - 2) * (tileRows - 2);
     linearSolve(b, x, previousX, a, 1 + 6 * a);
+}
+
+//This is the main function and will be called to progress the simulation
+void Dynamics::simulationStep() {
+    //"this" is a pointer
+    float visc     = this->viscosity;
+    float diff     = this->diffusion;
+    float dt       = this->timeSteps;
+    float *Vx      = this->velocityX;
+    float *Vy      = this->velocityY;
+    float *Vx0     = this->previousVelocityX;
+    float *Vy0     = this->previousVelocityY;
+    float *s       = this->previousDensity;
+    float *density = this->density;
+    
+    calculateDiffusion(1, Vx0, Vx, visc, dt);
+    calculateDiffusion(2, Vy0, Vy, visc, dt);
+    
+    project(Vx0, Vy0, Vx, Vy);
+    
+    advect(1, Vx, Vx0, Vx0, Vy0, dt);
+    advect(2, Vy, Vy0, Vx0, Vy0, dt);
+    
+    project(Vx, Vy, Vx0, Vy0);
+    
+    calculateDiffusion(0, s, density, diff, dt);
+    advect(0, density, s, Vx, Vy, dt);
 }
 
 //Basically what i understand is happen here is its saying "The value of the new cell is based on a function of itself and all of its neighbors"
@@ -116,10 +146,9 @@ void Dynamics::project(float *velocityX, float *velocityY, float *p, float *div)
 
     set_bnd(1, velocityX);
     set_bnd(2, velocityY);
-    set_bnd(3, velocityZ);
 }
 
-void Dynamics::advect(int b, float *density, float *previousDensity,  float *velocityX, float *velocityY) {
+void Dynamics::advect(int b, float *density, float *previousDensity,  float *velocityX, float *velocityY, float timeSteps) {
     float i0, i1, j0, j1; //Index and previous index
     
     float dtx = timeSteps * (tileCols - 2);
@@ -160,11 +189,37 @@ void Dynamics::advect(int b, float *density, float *previousDensity,  float *vel
             
             density[cast_1D_2D(i, j)] = 
             
-                s0 * ( t0 * previousDensity[cast_1D_2D(i0i, j0i)])
-                    +( t1 * previousDensity[cast_1D_2D(i0i, j1i)])
-                +s1 * ( t0 * previousDensity[cast_1D_2D(i1i, j0i)])
-                    +( t1 * previousDensity[cast_1D_2D(i1i, j1i)]);
+                s0 * ( t0 * previousDensity[cast_1D_2D(i0i, j0i)]) + ( t1 * previousDensity[cast_1D_2D(i0i, j1i)]) +
+                s1 * ( t0 * previousDensity[cast_1D_2D(i1i, j0i)]) + ( t1 * previousDensity[cast_1D_2D(i1i, j1i)]);
         }
     }
     set_bnd(b, density);
+}
+
+
+void Dynamics::set_bnd(int b, float *x)
+{
+    //Y:
+    for(int i = 1; i < tileRows - 1; i++) {
+        x[cast_1D_2D(i, 0)] = b == 2 ? -x[cast_1D_2D(i, 1)] : x[cast_1D_2D(i, 1)];
+
+        //Ternary operator, set cast_1D_2D(i, tileRows-1, k)] to -x[cast_1D_2D(i, tileRows-2, k)]- if b = 2 otherwise set it to x[cast_1D_2D(i, tileRows-2, k)]
+        x[cast_1D_2D(i, tileRows-1)] = b == 2 ? -x[cast_1D_2D(i, tileRows-2)] : x[cast_1D_2D(i, tileRows-2)];
+    }
+
+    //X:
+    for(int j = 1; j < tileCols - 1; j++) {
+        x[cast_1D_2D(0  , j)] = b == 1 ? -x[cast_1D_2D(1  , j)] : x[cast_1D_2D(1  , j)];
+        x[cast_1D_2D(tileCols-1, j)] = b == 1 ? -x[cast_1D_2D(tileCols-2, j)] : x[cast_1D_2D(tileCols-2, j)];
+    }
+
+    //I'm assuming each of these is for each border
+    
+    x[cast_1D_2D(0, 0)] = 0.33f * (x[cast_1D_2D(1, 0)] + x[cast_1D_2D(0, 1)]);
+
+    x[cast_1D_2D(0, tileRows-1)] = 0.33f * (x[cast_1D_2D(1, tileRows-1)] + x[cast_1D_2D(0, tileRows-2)]);
+
+    x[cast_1D_2D(tileCols-1, 0)] = 0.33f * (x[cast_1D_2D(tileCols-2, 0)] + x[cast_1D_2D(tileCols-1, 1)]);
+
+    x[cast_1D_2D(tileCols-1, tileRows-1)] = 0.33f * (x[cast_1D_2D(tileCols-2, tileRows-1)] + x[cast_1D_2D(tileCols-1, tileRows-2)]);
 }

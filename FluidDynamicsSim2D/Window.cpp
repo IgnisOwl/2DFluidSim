@@ -1,7 +1,8 @@
 #include "Window.hpp"
 
-/*Program made by Connor Michalec with help from: 
-        https://mikeash.com/pyblog/fluid-simulation-for-dummies.html */
+/*by Connor Michalec with help from: 
+        https://mikeash.com/pyblog/fluid-simulation-for-dummies.html and
+        https://www.youtube.com/watch?v=alhpH6ECFvQ&vl=en */
 
 signed int initializeGLEW() {
     #ifndef __APPLE__
@@ -32,6 +33,10 @@ Main::Main() {
 
         handleEvents();
 
+        //Calculate next step in fluid simulation:
+        dynamics.simulationStep();
+
+
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
         /*Render the data*/
@@ -43,7 +48,7 @@ Main::Main() {
         calculationTime = SDL_GetTicks() - calculationStartTime;   //gets how long it took to handle events and stuff
         if(calculationTime < frameDelay)                           //If the calculations took less time then delay the amount of time to make it the target framerate, otherwise don't delay
         {
-            //SDL_Delay(frameDelay - calculationTime);               //delay the amount of time it takes to make it 60fps minus the amount it took to perform calculations
+            SDL_Delay(frameDelay - calculationTime);               //delay the amount of time it takes to make it 60fps minus the amount it took to perform calculations
         }
 
         currentFPS = countedFrames / (SDL_GetTicks() / 1000.0f);                    //calculated current FPS
@@ -62,7 +67,7 @@ void Main::initialize() {
     //flags = SDL_WINDOW_FULLSCREEN;
 
     if(SDL_Init(SDL_INIT_EVERYTHING) == 0) {
-        window = SDL_CreateWindow("Simple Hydrodynamics test simulation", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+        window = SDL_CreateWindow("Simple fluid test simulation", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
             winSizeX, winSizeY, flags);
         if(!window) {
             // failed to create window

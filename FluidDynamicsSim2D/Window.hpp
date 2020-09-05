@@ -26,6 +26,9 @@ class Main {
         SDL_Renderer* getRenderer();
 
     private:
+        //Construct the dynamics object:
+        Dynamics dynamics;
+        
         SDL_Window *window;
         SDL_Renderer *renderer;
         Renderer dataRenderer;  //Object is cosntructed with default constructor when defined
