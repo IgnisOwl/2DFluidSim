@@ -92,14 +92,16 @@ void Main::initialize() {
 
 void Main::handleEvents() {
     const Uint8 *keystate = SDL_GetKeyboardState(NULL);
+
+    
+    if(keystate[SDL_SCANCODE_SPACE]) {
+        dynamics.addDensity(tileCols/2, tileRows/2, 200);
+        dynamics.addVelocity(tileCols/2, tileRows/2, 100, 0);
+    }
+
     //handle all events in queue
     SDL_Event event;
     while( SDL_PollEvent( &event ) != 0 ) {
-
-        if(keystate[SDL_SCANCODE_SPACE]) {
-            dynamics.addDensity(tileCols/2, tileRows/2, 200);
-            dynamics.addVelocity(tileCols/2, tileRows/2, 100, 0);
-        }
 
         switch(event.type) {
         case SDL_QUIT:
