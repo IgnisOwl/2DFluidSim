@@ -17,6 +17,7 @@ class Renderer {
         Renderer(SDL_Renderer* renderer); 
 
     private:
-
+        int* getColorGradient(float in);
+        void HSVtoRGB(float& fR, float& fG, float& fB, float& fH, float& fS, float& fV);
         
 };

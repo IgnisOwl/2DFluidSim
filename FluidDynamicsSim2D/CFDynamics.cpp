@@ -7,7 +7,7 @@ using namespace std;
  *   
  *   1) DIFFUSE - This basically *spreads out* the "highlighted liquid" amongst all the other liquid, like 
  *                   dye in a bowl of water, note that the velocity ALSO diffuses with this "highlighted fluid".
- *                   The Navier-Stokes equations is what calculates this.
+ *                   The Navier-Stokes equations is what calculates this. It's kinda the amount it "fades"
  *
  *   2) PROJECT -  This is tied to the concept of the fluid being incompressible, so the amount of fluid going in has to
  *                   be equal to the amount coming up, this is a setup stage to put the system into equilibrium. Basically it

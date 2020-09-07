@@ -21,9 +21,9 @@ class Dynamics {
     private:
         /*SETTINGS*/
         const float timeSteps = 0.001;   //How fast the simulation runs
-        const float diffusion = 0.01;    //How the velocity and vectors diffuse through the fluid
+        const float diffusion = 0.00005;    //How the velocity and vectors diffuse through the fluid
         const float viscosity = 0.000000001;    //Viscocity of the fluid
-        const float iterations = 11;
+        const float iterations = 15;
         /*        */
 
         /*RUNTIME ARRAYS TODO: Dynamically allocated them on heap instead(with malloc)*/

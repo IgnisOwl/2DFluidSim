@@ -93,10 +93,34 @@ void Main::initialize() {
 void Main::handleEvents() {
     const Uint8 *keystate = SDL_GetKeyboardState(NULL);
 
+    //Orgiinal mouse position
+    int mouseX;
+    int mouseY;
+    SDL_GetMouseState(&mouseY, &mouseX);
+
+    //Mouse position converted to the grid
+    int mouseConvX = mouseX/(winSizeX/tileCols);
+    int mouseConvY = mouseY/(winSizeY/tileRows);
+
+    //dynamics.addDensity(tileCols/2, tileRows/2, 255);
+    //dynamics.addVelocity(tileCols/2, tileRows/2, 100, 0);
+
     
-    if(keystate[SDL_SCANCODE_SPACE]) {
-        dynamics.addDensity(tileCols/2, tileRows/2, 200);
-        dynamics.addVelocity(tileCols/2, tileRows/2, 100, 0);
+    if(keystate[SDL_SCANCODE_A]) {
+        dynamics.addDensity(mouseConvX, mouseConvY, 255);
+        dynamics.addVelocity(mouseConvX, mouseConvY, -100, 0);
+    }
+    else if(keystate[SDL_SCANCODE_D]) {
+        dynamics.addDensity(mouseConvX, mouseConvY, 255);
+        dynamics.addVelocity(mouseConvX, mouseConvY, 100, 0);
+    }
+    else if(keystate[SDL_SCANCODE_S]) {
+        dynamics.addDensity(mouseConvX, mouseConvY, 255);
+        dynamics.addVelocity(mouseConvX, mouseConvY, 0, 100);
+    }
+    else if(keystate[SDL_SCANCODE_W]) {
+        dynamics.addDensity(mouseConvX, mouseConvY, 255);
+        dynamics.addVelocity(mouseConvX, mouseConvY, 0, -100);
     }
 
     //handle all events in queue

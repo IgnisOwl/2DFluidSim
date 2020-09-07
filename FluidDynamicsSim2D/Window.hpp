@@ -13,9 +13,9 @@
 #include "CFDynamics.hpp"
 
 //Extern/global vars
-int winSizeX = 500;         //Tile size will automatically adjust according to this
-int winSizeY = 500;         //Tile size will automatically adjust according to this
-int tileRows = 50;
+int winSizeX = 800;         //Tile size will automatically adjust according to this
+int winSizeY = 800;         //Tile size will automatically adjust according to this
+int tileRows = 114;
 int tileCols = tileRows;    //Don't alter this, it will break
 
 class Main {
