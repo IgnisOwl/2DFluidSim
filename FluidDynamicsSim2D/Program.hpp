@@ -13,7 +13,7 @@ extern int winSizeX;
 extern int winSizeY;
 extern int tileRows;
 extern int tileCols;
-extern int cellBuffer;
+//extern int cellBuffer;    //reimplement later?
 extern vector<vector<unique_ptr<float>>> simulationGrid;
 
 #endif

@@ -12,15 +12,17 @@ class Dynamics {
         Dynamics();
         ~Dynamics();
         //Converts the 1d matrix being used in this class to 2D vectors for easier graphical representation
-        vector<vector<unique_ptr<float>>> getProcessedStep(vector<vector<unique_ptr<float>>>& gridIn);
+        void setProcessedSteps(vector<vector<unique_ptr<float>>>& gridIn);
 
         void simulationStep();
+        void addDensity(int x, int y, float amount);      //This function adds fluid desnsity to a specified location
+        void addVelocity(int x, int y, float amountX, float amountY);      //This function adds fluid velocity to a specified location 
 
     private:
         /*SETTINGS*/
-        const float timeSteps = 0.1;   //How fast the simulation runs
-        const float diffusion = 1;    //How the velocity and vectors diffuse through the fluid
-        const float viscosity = 1;    //Viscocity of the fluid
+        const float timeSteps = 0.001;   //How fast the simulation runs
+        const float diffusion = 0.01;    //How the velocity and vectors diffuse through the fluid
+        const float viscosity = 0.000000001;    //Viscocity of the fluid
         const float iterations = 11;
         /*        */
 
@@ -35,10 +37,6 @@ class Dynamics {
         float* previousVelocityX;
         /*              */
 
-
-
-        void addDensity(int x, int y, float amount);      //This function adds fluid desnsity to a specified location
-        void addVelocity(int x, int y, float amountX, float amountY);      //This function adds fluid velocity to a specified location 
 
         //CONFUSING(I barely know how these work):
         void calculateDiffusion(int b, float* x, float* previousX, float diffusion, float timeSteps);

@@ -27,7 +27,7 @@ using namespace std;
  *                    
  */
 Dynamics::Dynamics() {
-        //setup
+        //setup, store on heap
         previousDensity = new float[tileRows*tileCols];
         density = new float[tileRows*tileCols];
 
@@ -39,19 +39,28 @@ Dynamics::Dynamics() {
 }
 
 Dynamics::~Dynamics() {
-    delete previousDensity;
-    delete density;
+    delete[] previousDensity;
+    delete[] density;
 
-    delete velocityY;
-    delete previousVelocityY;
+    delete[] velocityY;
+    delete[] previousVelocityY;
 
-    delete velocityX;
-    delete previousVelocityX;
+    delete[] velocityX;
+    delete[] previousVelocityX;
 }
 
-vector<vector<unique_ptr<float>>> Dynamics::getProcessedStep(vector<vector<unique_ptr<float>>>& gridIn) {
-    vector<vector<unique_ptr<float>>> gridOut = vector<vector<unique_ptr<float>>>();
-    return(gridOut);
+void Dynamics::setProcessedSteps(vector<vector<unique_ptr<float>>>& gridIn) {
+    for(int rowi = 0; rowi<gridIn.size(); rowi++) {
+        vector<unique_ptr<float>> row;
+
+        for(int coli = 0; coli<gridIn.at(rowi).size(); coli++) {
+            row.push_back(make_unique<float>(density[cast_1D_2D(coli, rowi)]));
+            //cout << sizeof(density)/sizeof(density[0]) << endl;
+            //    //No change
+            //   row.push_back(move(gridIn.at(rowi).at(coli)));
+        }
+        gridIn.at(rowi) = move(row);
+    }
 }
 
 void Dynamics::addDensity(int x, int y, float amount) {
@@ -60,9 +69,10 @@ void Dynamics::addDensity(int x, int y, float amount) {
 }
 
 void Dynamics::addVelocity(int x, int y, float amountX, float amountY) {
+    //Im unsure why the x and ys are flipped
     int index = cast_1D_2D(x, y);
-    density[index] += amountX;
-    density[index] += amountY;
+    velocityX[index] += amountY;
+    velocityY[index] += amountX;
 }
 
 void Dynamics::calculateDiffusion(int b, float* x, float* previousX, float diffusion, float timeSteps) {
@@ -72,29 +82,20 @@ void Dynamics::calculateDiffusion(int b, float* x, float* previousX, float diffu
 
 //This is the main function and will be called to progress the simulation
 void Dynamics::simulationStep() {
-    //"this" is a pointer
-    float visc     = this->viscosity;
-    float diff     = this->diffusion;
-    float dt       = this->timeSteps;
-    float *Vx      = this->velocityX;
-    float *Vy      = this->velocityY;
-    float *Vx0     = this->previousVelocityX;
-    float *Vy0     = this->previousVelocityY;
-    float *s       = this->previousDensity;
-    float *density = this->density;
+    //OLD "this" is a pointer
     
-    calculateDiffusion(1, Vx0, Vx, visc, dt);
-    calculateDiffusion(2, Vy0, Vy, visc, dt);
+    calculateDiffusion(1, previousVelocityX, velocityX, viscosity, timeSteps);
+    calculateDiffusion(2, previousVelocityY, velocityY, viscosity, timeSteps);
     
-    project(Vx0, Vy0, Vx, Vy);
+    project(previousVelocityX, previousVelocityY, velocityX, velocityY);
     
-    advect(1, Vx, Vx0, Vx0, Vy0, dt);
-    advect(2, Vy, Vy0, Vx0, Vy0, dt);
+    advect(1, velocityX, previousVelocityX, previousVelocityX, previousVelocityY, timeSteps);
+    advect(2, velocityY, previousVelocityY, previousVelocityX, previousVelocityY, timeSteps);
     
-    project(Vx, Vy, Vx0, Vy0);
+    project(velocityX, velocityY, previousVelocityX, previousVelocityY);
     
-    calculateDiffusion(0, s, density, diff, dt);
-    advect(0, density, s, Vx, Vy, dt);
+    calculateDiffusion(0, previousDensity, density, diffusion, timeSteps);
+    advect(0, density, previousDensity, velocityX, velocityY, timeSteps);
 }
 
 //Basically what i understand is happen here is its saying "The value of the new cell is based on a function of itself and all of its neighbors"
@@ -132,8 +133,7 @@ void Dynamics::project(float *velocityX, float *velocityY, float *p, float *div)
 
     set_bnd(0, div); 
     set_bnd(0, p);
-
-    linearSolve(0, p, div, 1, 6);
+    linearSolve(0, p, div, 1, 4);
     
     for (int j = 1; j < tileRows - 1; j++) {
         for (int i = 1; i < tileCols - 1; i++) {
@@ -148,7 +148,7 @@ void Dynamics::project(float *velocityX, float *velocityY, float *p, float *div)
     set_bnd(2, velocityY);
 }
 
-void Dynamics::advect(int b, float *density, float *previousDensity,  float *velocityX, float *velocityY, float timeSteps) {
+void Dynamics::advect(int b, float *density, float *previousDensity, float *velocityX, float *velocityY, float timeSteps) {
     float i0, i1, j0, j1; //Index and previous index
     
     float dtx = timeSteps * (tileCols - 2);
@@ -188,9 +188,8 @@ void Dynamics::advect(int b, float *density, float *previousDensity,  float *vel
             int j1i = j1;
             
             density[cast_1D_2D(i, j)] = 
-            
-                s0 * ( t0 * previousDensity[cast_1D_2D(i0i, j0i)]) + ( t1 * previousDensity[cast_1D_2D(i0i, j1i)]) +
-                s1 * ( t0 * previousDensity[cast_1D_2D(i1i, j0i)]) + ( t1 * previousDensity[cast_1D_2D(i1i, j1i)]);
+                s0 * ( t0 * previousDensity[cast_1D_2D(i0i, j0i)] + t1 * previousDensity[cast_1D_2D(i0i, j1i)]) +
+                s1 * ( t0 * previousDensity[cast_1D_2D(i1i, j0i)] + t1 * previousDensity[cast_1D_2D(i1i, j1i)]);
         }
     }
     set_bnd(b, density);

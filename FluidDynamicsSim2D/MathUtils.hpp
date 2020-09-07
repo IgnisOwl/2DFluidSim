@@ -23,6 +23,9 @@ static vector<vector<unique_ptr<int>>> normalize2DMatrix(vector<vector<unique_pt
             * As I came up with this formula myself, in the future replace with a more
             * efficient one.
             */
+            if(oldVal>inMax) {
+                oldVal=inMax;
+            }
             unique_ptr<int> dim1 = make_unique<int>(round((oldVal*((float)outMax-(float)outMin))/(inMax-inMin)));
 
             dim2.push_back(std::move(dim1));
@@ -51,6 +54,9 @@ static vector<vector<unique_ptr<float>>> normalize2DMatrix(vector<vector<unique_
             * As I came up with this formula myself, in the future replace with a more
             * efficient one.
             */
+            if(oldVal>inMax) {
+                oldVal=inMax;
+            }
             unique_ptr<float> dim1 = make_unique<float>((oldVal*(outMax-outMin))/(inMax-inMin));
 
             dim2.push_back(std::move(dim1));

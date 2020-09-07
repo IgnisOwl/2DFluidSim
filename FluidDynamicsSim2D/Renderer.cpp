@@ -27,14 +27,18 @@ void Renderer::renderData() {
 
     SDL_Rect rect;
 
-    float calculatedTileWidth = ((float)winSizeX / (float)tileCols) / (1+((float)cellBuffer/1000));
-    float calculatedTileHeight = ((float)winSizeY / (float)tileRows) / (1+((float)cellBuffer/1000));
-    /*This helps place the grid in the center of the screen regardless of the buffer*/
-    float initialOffsetX = (((1+((float)cellBuffer/1000))*calculatedTileWidth)-calculatedTileWidth)/2;
-    float initialOffsetY = (((1+((float)cellBuffer/1000))*calculatedTileHeight)-calculatedTileHeight)/2;
+    float calculatedTileWidth = ((float)winSizeX) / ((float)tileCols);
+    float calculatedTileHeight = ((float)winSizeY) / ((float)tileRows);
+
+    int tileWidth = (int) round(((float)winSizeX) / ((float)tileCols));
+    int tileHeight = (int) round(((float)winSizeY) / ((float)tileRows));
+
+    int offsetX = round((winSizeX % tileRows)*0.5f); 
+    int offsetY = round((winSizeY % tileCols)*0.5f); 
     /*                      */
 
-    vector<vector<unique_ptr<int>>> normalizedDataMatrix = normalize2DMatrix(simulationGrid, 0.0F, 1.0F, 0, 255);     //convert vals 0-1 to 0-255
+    vector<vector<unique_ptr<int>>> normalizedDataMatrix = normalize2DMatrix(simulationGrid, 0.0F, 100.0F, 0, 255);     //convert vals 0-1 to 0-255
+
 
     int colorVal;
 
@@ -42,12 +46,12 @@ void Renderer::renderData() {
         for(int colIndex = 0; colIndex < tileCols; colIndex++) {
             colorVal = *normalizedDataMatrix.at(rowIndex).at(colIndex);
             SDL_SetRenderDrawColor(windowRenderer, colorVal, colorVal, colorVal, 255);
-
             //resuse type
-            rect.x = initialOffsetX + (colIndex * calculatedTileWidth * (1+((float)cellBuffer/1000)));
-            rect.y = initialOffsetY + (rowIndex * calculatedTileHeight * (1+((float)cellBuffer/1000)));
-            rect.w = calculatedTileWidth;
-            rect.h = calculatedTileHeight;
+
+            rect.x = (rowIndex*tileWidth) + offsetX;
+            rect.y = (colIndex*tileWidth) + offsetY;
+            rect.w = tileWidth;
+            rect.h = tileHeight;
 
             SDL_RenderFillRect(windowRenderer, &rect);
         }
