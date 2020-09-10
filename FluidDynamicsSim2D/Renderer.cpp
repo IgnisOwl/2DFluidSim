@@ -47,6 +47,7 @@ void Renderer::renderData() {
             colorVal = getColorGradient(*normalizedDataMatrix.at(rowIndex).at(colIndex));
 
             SDL_SetRenderDrawColor(windowRenderer, colorVal[0], colorVal[1], colorVal[2], 255);
+            //SDL_SetRenderDrawColor(windowRenderer, *normalizedDataMatrix.at(rowIndex).at(colIndex), *normalizedDataMatrix.at(rowIndex).at(colIndex), *normalizedDataMatrix.at(rowIndex).at(colIndex), 255);
             //resuse type
 
             rect.x = (rowIndex*tileWidth) + offsetX;
@@ -60,7 +61,6 @@ void Renderer::renderData() {
 }
 
 int* Renderer::getColorGradient(float in) {
-    //Basically HSB but lazier
 
     static int ret[3];
 
